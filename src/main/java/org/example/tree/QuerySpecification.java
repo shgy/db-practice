@@ -14,26 +14,29 @@ public class QuerySpecification
 {
     private final Select select;
     private final Optional<Relation> from;
-
+    private final Optional<Expression> where;
     public QuerySpecification(
             Select select,
-            Optional<Relation> from)
+            Optional<Relation> from,
+            Optional<Expression> where)
     {
-        this(Optional.empty(), select, from);
+        this(Optional.empty(), select, from,where);
     }
 
     public QuerySpecification(
             NodeLocation location,
             Select select,
-            Optional<Relation> from)
+            Optional<Relation> from,
+            Optional<Expression> where)
     {
-        this(Optional.of(location), select, from);
+        this(Optional.of(location), select, from,where);
     }
 
     private QuerySpecification(
             Optional<NodeLocation> location,
             Select select,
-            Optional<Relation> from)
+            Optional<Relation> from,
+            Optional<Expression> where)
     {
         super(location);
         requireNonNull(select, "select is null");
@@ -42,7 +45,7 @@ public class QuerySpecification
 
         this.select = select;
         this.from = from;
-
+        this.where = where;
     }
 
     public Select getSelect()
@@ -55,6 +58,7 @@ public class QuerySpecification
         return from;
     }
 
+    public Optional<Expression> getWhere(){return where;}
 
     @Override
     public List<Node> getChildren()

@@ -19,6 +19,16 @@ public abstract class Node
         return location;
     }
 
+
+    /**
+     * Accessible for {@link AstVisitor}, use {@link AstVisitor#process(Node, Object)} instead.
+     */
+    protected <R, C> R accept(AstVisitor<R, C> visitor, C context)
+    {
+        return visitor.visitNode(this, context);
+    }
+
+
     public abstract List<? extends Node> getChildren();
 
     // Force subclasses to have a proper equals and hashcode implementation

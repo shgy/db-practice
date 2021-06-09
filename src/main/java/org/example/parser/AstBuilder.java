@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.example.antlr.SqlBaseBaseVisitor;
+import org.example.antlr.SqlBaseLexer;
 import org.example.antlr.SqlBaseParser;
 import org.example.tree.*;
 
@@ -31,6 +32,12 @@ public class AstBuilder
     public Node visitSingleStatement(SqlBaseParser.SingleStatementContext context)
     {
         return visit(context.statement());
+    }
+
+    @Override
+    public Node visitSingleExpression(SqlBaseParser.SingleExpressionContext context)
+    {
+        return visit(context.expression());
     }
 
     @Override
@@ -62,7 +69,8 @@ public class AstBuilder
                     new QuerySpecification(
                             getLocation(context),
                             query.getSelect(),
-                            query.getFrom()
+                            query.getFrom(),
+                            query.getWhere()
                             ));
         }
 
@@ -89,7 +97,8 @@ public class AstBuilder
         return new QuerySpecification(
                 getLocation(context),
                 new Select(getLocation(context.SELECT()), false, selectItems),
-                from);
+                from,
+                visitIfPresent(context.where, Expression.class));
     }
 
     @Override
@@ -115,6 +124,84 @@ public class AstBuilder
     {
         return new Identifier(getLocation(context), context.getText(), false);
     }
+
+    @Override
+    public Node visitPredicated(SqlBaseParser.PredicatedContext context)
+    {
+        if (context.predicate() != null) {
+            return visit(context.predicate());
+        }
+
+        return visit(context.valueExpression);
+    }
+
+    // ***************** boolean expressions ******************
+
+    @Override
+    public Node visitLogicalNot(SqlBaseParser.LogicalNotContext context)
+    {
+        return new NotExpression(getLocation(context), (Expression) visit(context.booleanExpression()));
+    }
+
+    @Override
+    public Node visitLogicalBinary(SqlBaseParser.LogicalBinaryContext context)
+    {
+        return new LogicalBinaryExpression(
+                getLocation(context.operator),
+                getLogicalBinaryOperator(context.operator),
+                (Expression) visit(context.left),
+                (Expression) visit(context.right));
+    }
+
+    private static LogicalBinaryExpression.Operator getLogicalBinaryOperator(Token token)
+    {
+        switch (token.getType()) {
+            case SqlBaseLexer.AND:
+                return LogicalBinaryExpression.Operator.AND;
+            case SqlBaseLexer.OR:
+                return LogicalBinaryExpression.Operator.OR;
+        }
+
+        throw new IllegalArgumentException("Unsupported operator: " + token.getText());
+    }
+
+    @Override
+    public Node visitIntegerLiteral(SqlBaseParser.IntegerLiteralContext context)
+    {
+        return new LongLiteral(getLocation(context), context.getText());
+    }
+
+    @Override
+    public Node visitComparison(SqlBaseParser.ComparisonContext context)
+    {
+        return new ComparisonExpression(
+                getLocation(context.comparisonOperator()),
+                getComparisonOperator(((TerminalNode) context.comparisonOperator().getChild(0)).getSymbol()),
+                (Expression) visit(context.value),
+                (Expression) visit(context.right));
+    }
+
+
+    private static ComparisonExpression.Operator getComparisonOperator(Token symbol)
+    {
+        switch (symbol.getType()) {
+            case SqlBaseLexer.EQ:
+                return ComparisonExpression.Operator.EQUAL;
+            case SqlBaseLexer.NEQ:
+                return ComparisonExpression.Operator.NOT_EQUAL;
+            case SqlBaseLexer.LT:
+                return ComparisonExpression.Operator.LESS_THAN;
+            case SqlBaseLexer.LTE:
+                return ComparisonExpression.Operator.LESS_THAN_OR_EQUAL;
+            case SqlBaseLexer.GT:
+                return ComparisonExpression.Operator.GREATER_THAN;
+            case SqlBaseLexer.GTE:
+                return ComparisonExpression.Operator.GREATER_THAN_OR_EQUAL;
+        }
+
+        throw new IllegalArgumentException("Unsupported operator: " + symbol.getText());
+    }
+
 
     private QualifiedName getQualifiedName(SqlBaseParser.QualifiedNameContext context)
     {

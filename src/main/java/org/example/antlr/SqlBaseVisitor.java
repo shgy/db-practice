@@ -17,6 +17,12 @@ public interface SqlBaseVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSingleStatement(SqlBaseParser.SingleStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link SqlBaseParser#singleExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSingleExpression(SqlBaseParser.SingleExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code statementDefault}
 	 * labeled alternative in {@link SqlBaseParser#statement}.
 	 * @param ctx the parse tree
@@ -76,12 +82,33 @@ public interface SqlBaseVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpression(SqlBaseParser.ExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code logicalNot}
+	 * labeled alternative in {@link SqlBaseParser#booleanExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicalNot(SqlBaseParser.LogicalNotContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code predicated}
 	 * labeled alternative in {@link SqlBaseParser#booleanExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitPredicated(SqlBaseParser.PredicatedContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code logicalBinary}
+	 * labeled alternative in {@link SqlBaseParser#booleanExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLogicalBinary(SqlBaseParser.LogicalBinaryContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code comparison}
+	 * labeled alternative in {@link SqlBaseParser#predicate}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitComparison(SqlBaseParser.ComparisonContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code valueExpressionDefault}
 	 * labeled alternative in {@link SqlBaseParser#valueExpression}.
@@ -96,6 +123,27 @@ public interface SqlBaseVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitColumnReference(SqlBaseParser.ColumnReferenceContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code numericLiteral}
+	 * labeled alternative in {@link SqlBaseParser#primaryExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumericLiteral(SqlBaseParser.NumericLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code booleanLiteral}
+	 * labeled alternative in {@link SqlBaseParser#primaryExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBooleanLiteral(SqlBaseParser.BooleanLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code stringLiteral}
+	 * labeled alternative in {@link SqlBaseParser#primaryExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitStringLiteral(SqlBaseParser.StringLiteralContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SqlBaseParser#sampledRelation}.
 	 * @param ctx the parse tree
@@ -121,6 +169,32 @@ public interface SqlBaseVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitQualifiedName(SqlBaseParser.QualifiedNameContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code integerLiteral}
+	 * labeled alternative in {@link SqlBaseParser#number}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntegerLiteral(SqlBaseParser.IntegerLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SqlBaseParser#booleanValue}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBooleanValue(SqlBaseParser.BooleanValueContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code basicStringLiteral}
+	 * labeled alternative in {@link SqlBaseParser#string}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBasicStringLiteral(SqlBaseParser.BasicStringLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SqlBaseParser#comparisonOperator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitComparisonOperator(SqlBaseParser.ComparisonOperatorContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code unquotedIdentifier}
 	 * labeled alternative in {@link SqlBaseParser#identifier}.

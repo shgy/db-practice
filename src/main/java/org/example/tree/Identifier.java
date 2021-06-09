@@ -71,6 +71,14 @@ public class Identifier
         return Objects.equals(value, that.value);
     }
 
+
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context)
+    {
+        return visitor.visitIdentifier(this, context);
+    }
+
+
     @Override
     public int hashCode()
     {

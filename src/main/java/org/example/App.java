@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.example.execute.Row;
+import org.example.filter.FilterFieldVisitor;
+import org.example.filter.WhereExprFilter;
 import org.example.parser.SqlParser;
 import org.example.tree.*;
 
@@ -67,13 +69,15 @@ public class App
         List<Row> rowList = Lists.newArrayList();
         for(CSVRecord record:records){
             Row row = new Row();
+
             for(String field:fieldNames){
                 row.addColumn(record.get(field));
+
             }
             rowList.add(row);
         }
 
-        /**
+         /**
          * 格式化输出到控制台
          */
         int width=30;

@@ -9,6 +9,11 @@ singleStatement
     : statement EOF
     ;
 
+singleExpression
+    : expression EOF
+    ;
+
+
 statement
     : query                                                            #statementDefault
     ;
@@ -32,6 +37,7 @@ queryPrimary
 querySpecification
     : SELECT  selectItem (',' selectItem)*
       (FROM relation (',' relation)*)?
+      (WHERE where=booleanExpression)?
     ;
 
 selectItem
@@ -47,7 +53,15 @@ expression
     ;
 
 booleanExpression
-    : valueExpression             #predicated
+    : valueExpression predicate[$valueExpression.ctx]?             #predicated
+    | NOT booleanExpression                                        #logicalNot
+    | left=booleanExpression operator=AND right=booleanExpression  #logicalBinary
+    | left=booleanExpression operator=OR right=booleanExpression   #logicalBinary
+    ;
+
+// workaround for https://github.com/antlr/antlr4/issues/780
+predicate[ParserRuleContext value]
+    : comparisonOperator right=valueExpression                            #comparison
     ;
 
 valueExpression
@@ -56,6 +70,9 @@ valueExpression
 
 primaryExpression
     : identifier                                                                          #columnReference
+    | number                                                                              #numericLiteral
+    | booleanValue                                                                        #booleanLiteral
+    | string                                                                              #stringLiteral
     ;
 
 sampledRelation
@@ -74,12 +91,41 @@ qualifiedName
     : identifier ('.' identifier)*
     ;
 
+number
+    : INTEGER_VALUE  #integerLiteral
+    ;
+booleanValue
+    : TRUE | FALSE
+    ;
+string
+    : STRING                                #basicStringLiteral
+    ;
+
+comparisonOperator
+    : EQ | NEQ | LT | LTE | GT | GTE
+    ;
+
 identifier
     : IDENTIFIER             #unquotedIdentifier
     ;
 
-SELECT: 'SELECT';
+
+
+AND: 'AND';
 FROM: 'FROM';
+FALSE: 'FALSE';
+NOT: 'NOT';
+OR: 'OR';
+SELECT: 'SELECT';
+TRUE: 'TRUE';
+WHERE: 'WHERE';
+
+EQ  : '=';
+NEQ : '<>' | '!=';
+LT  : '<';
+LTE : '<=';
+GT  : '>';
+GTE : '>=';
 
 fragment DIGIT
     : [0-9]
@@ -89,9 +135,18 @@ fragment LETTER
     : [A-Z]
     ;
 
+STRING
+    : '\'' ( ~'\'' | '\'\'' )* '\''
+    ;
+
+INTEGER_VALUE
+    : DIGIT+
+    ;
+
 IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '_' | '@' | ':')*
     ;
+
 
 WS
     : [ \r\n\t]+ -> channel(HIDDEN)

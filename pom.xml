@@ -31,7 +31,11 @@
       <artifactId>slice</artifactId>
       <version>0.35</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.airlift</groupId>
+      <artifactId>bytecode</artifactId>
+      <version>1.0</version>
+    </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -46,6 +50,19 @@
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
       <version>4.6</version>
+    </dependency>
+
+    <!--jmh 基准测试 -->
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>1.23</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>1.23</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

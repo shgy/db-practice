@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.example.antlr.SqlBaseLexer;
 import org.example.antlr.SqlBaseParser;
-import org.example.antlr.SqlBaseVisitor;
+import org.example.tree.Expression;
 import org.example.tree.Node;
 import org.example.tree.Statement;
 
@@ -28,6 +28,21 @@ public class SqlParser {
     {
         return (Statement) invokeParser("statement", sql, SqlBaseParser::singleStatement, parsingOptions);
     }
+
+    /**
+     * Consider using {@link #createExpression(String, ParsingOptions)}
+     */
+    @Deprecated
+    public Expression createExpression(String expression)
+    {
+        return createExpression(expression, new ParsingOptions());
+    }
+
+    public Expression createExpression(String expression, ParsingOptions parsingOptions)
+    {
+        return (Expression) invokeParser("expression", expression, SqlBaseParser::singleExpression, parsingOptions);
+    }
+
 
     private Node invokeParser(String name, String sql, Function<SqlBaseParser, ParserRuleContext> parseFunction, ParsingOptions parsingOptions)
     {
