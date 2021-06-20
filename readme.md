@@ -3,7 +3,7 @@
 
 v1.1版本的功能特性如下：
 1. 基于代码生成技术实现SQL filter的功能。
-
+2. SQL支持where 实现过滤整型字段，例如：select id, name from employee where id>1
 
 文章组织如下：
 1. 业务问题的背景
