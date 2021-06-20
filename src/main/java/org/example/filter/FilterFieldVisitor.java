@@ -1,10 +1,8 @@
 package org.example.filter;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.example.tree.*;
 
-import java.util.List;
 import java.util.Set;
 
 public class FilterFieldVisitor extends AstVisitor<Void,Set<String>> {
