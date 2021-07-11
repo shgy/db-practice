@@ -11,6 +11,26 @@ public abstract class AstVisitor<R, C> {
         return node.accept(this, context);
     }
 
+
+    protected R visitQuerySpecification(QuerySpecification node, C context)
+    {
+        return visitQueryBody(node, context);
+    }
+
+    protected R visitJoin(Join node, C context)
+    {
+        return visitRelation(node, context);
+    }
+    protected R visitRelation(Relation node, C context)
+    {
+        return visitNode(node, context);
+    }
+
+    protected R visitQueryBody(QueryBody node, C context)
+    {
+        return visitRelation(node, context);
+    }
+
     protected R visitNode(Node node, C context) {
         return null;
     }
@@ -42,5 +62,10 @@ public abstract class AstVisitor<R, C> {
     protected R visitComparisonExpression(ComparisonExpression node, C context)
     {
         return visitExpression(node, context);
+    }
+
+    protected R visitTable(Table node, C context)
+    {
+        return visitQueryBody(node, context);
     }
 }

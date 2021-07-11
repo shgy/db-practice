@@ -1,16 +1,13 @@
 package org.example;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.example.codegen.WhereExprFilterCompiler;
 import org.example.execute.Row;
 import org.example.filter.FilterFieldVisitor;
 import org.example.filter.RowFilter;
-import org.example.filter.WhereExprFilter;
 import org.example.operator.OperatorContext;
-import org.example.operator.OutputOperator;
-import org.example.operator.TableScanOperator;
+import org.example.operator.OutputOperator_d;
+import org.example.operator.TableScanOperator_d;
 import org.example.parser.SqlParser;
 import org.example.tree.*;
 
@@ -87,8 +84,8 @@ public class App
     private static void execute(OperatorContext context){
 
 
-        TableScanOperator tableScan = new TableScanOperator(context);
-        OutputOperator output  = new OutputOperator(context);
+        TableScanOperator_d tableScan = new TableScanOperator_d(context);
+        OutputOperator_d output  = new OutputOperator_d(context);
         List<Row> rowList = tableScan.getOutput();
         output.addInput(rowList);
         output.getOutput();

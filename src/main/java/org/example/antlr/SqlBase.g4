@@ -45,7 +45,18 @@ selectItem
     ;
 
 relation
-    :  sampledRelation                             #relationDefault
+    : left=relation
+      ( joinType JOIN rightRelation=relation joinCriteria
+      )                                           #joinRelation
+    | sampledRelation                             #relationDefault
+    ;
+
+joinType
+    : INNER?
+    ;
+
+joinCriteria
+    : ON booleanExpression
     ;
 
 expression
@@ -114,8 +125,10 @@ identifier
 AND: 'AND';
 FROM: 'FROM';
 FALSE: 'FALSE';
+JOIN: 'JOIN';
 NOT: 'NOT';
 OR: 'OR';
+ON: 'ON';
 SELECT: 'SELECT';
 TRUE: 'TRUE';
 WHERE: 'WHERE';
