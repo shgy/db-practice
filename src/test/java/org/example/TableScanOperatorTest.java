@@ -15,15 +15,14 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Optional;
 
-public class TestTableScanOperator {
+public class TableScanOperatorTest {
 
     @Test
     public void testReadData(){
 
         List<Type> types = Lists.newArrayList(BigintType.BIGINT, VarcharType.VARCHAR,BigintType.BIGINT);
         List<String> fieldNames = Lists.newArrayList("id","name","age");
-        TableScanOperator operator = new TableScanOperator("employee",types,fieldNames
-                );
+        TableScanOperator operator = new TableScanOperator("employee",types,fieldNames);
         Page page= operator.getOutput();
         OutputOperator outputOperator = new OutputOperator(types,fieldNames, Optional.empty());
         outputOperator.addInput(page);

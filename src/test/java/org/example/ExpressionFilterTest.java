@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class TestExpressionFilter {
+public class ExpressionFilterTest {
 
     @Test
     public void testDirectFilter(){

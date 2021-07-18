@@ -2,9 +2,7 @@
 
 
 v1.2版本的功能特性如下：
-1. 实现JOIN的功能
-
-
+1. 实现CROSS JOIN的功能
 
 步骤：
 1. selectBase.g4支持JOIN语法
@@ -15,8 +13,6 @@ v1.2版本的功能特性如下：
 问题：
 1. presto的Page/Block机制
 2. presto的Join实现机制
-
-
 
 # 处理细节
 antlr4 -package org.example.antlr -no-listener -visitor .\SqlBase.g4
@@ -55,7 +51,21 @@ antlr4 -package org.example.antlr -no-listener -visitor .\SqlBase.g4
 装载到Block中，如何封装到Page中呢？
 定义一个Block类型的数组即可。每个字段给一个唯一的下标编号，从0开始。这样就能跟Block数组关联起来
 
-==========
+===========================
+
+通过编码实现细节，识别到低估了JOIN实现的难度。通过对Cross Join的实现，收获了如下的点：
+
+1. 初步理解了Presto中 Analyzer的作用
+   将元数据SQL语句进行绑定，确保查询的字段和表能沟通对应上。
+
+2. 初步理解了Analyzer中Scope, 即作用域的作用。
+   每个Scope的输出结果有可能是不一样的，比如Table和JOIN两类节点就完全不同，所以需要RelationType来记录。
+
+3. NestedLoopJoin的实现基本思路。
+
+其实还有很多细节点，这里就不一一列举了。 所谓纸上得来终觉浅，这句话特别适用于编程领域。 只看完一本《Presto技术内幕》对于Presto的理解是完全不够的。
+
+关于JOIN, 后续再继续深挖。当前的理解水平目前不足以支撑快速输出一篇技术文章。 接下来开始探索：精确计数和近似计数在Presto中的实现。
 
 
 

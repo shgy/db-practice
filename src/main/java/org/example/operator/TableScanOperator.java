@@ -38,6 +38,8 @@ public class TableScanOperator implements Operator{
 
     private PageBuilder pageBuilder;
 
+    private boolean readFinished=false;
+
     public TableScanOperator(String tableName, List<Type> types,List<String> fieldNames){
         this.tableName = tableName;
         this.types = types;
@@ -53,46 +55,53 @@ public class TableScanOperator implements Operator{
 
     @Override
     public Page getOutput() {
-        try{
+        if(readFinished){
+            return null;
+        }else{
+            try{
 
-            /**
-             * 基于表名确定查询的数据源文件
-             */
-            String fileLoc = String.format("./data/%s.csv",tableName);
-            /**
-             * 从csv文件中读取指定的字段
-             */
-            Reader in = new FileReader(fileLoc);
-            Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
+                /**
+                 * 基于表名确定查询的数据源文件
+                 */
+                String fileLoc = String.format("./data/%s.csv",tableName);
+                /**
+                 * 从csv文件中读取指定的字段
+                 */
+                Reader in = new FileReader(fileLoc);
+                Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
 
-            for(CSVRecord record:records){
+                for(CSVRecord record:records){
 
-                pageBuilder.declarePosition();
-                for (int column = 0; column < types.size(); column++) {
-                    BlockBuilder output = pageBuilder.getBlockBuilder(column);
-                    String fieldName = fieldNames.get(column);
-                    String colVal = record.get(fieldName);
-                    Type type = types.get(column);
-                    Class<?> javaType = type.getJavaType();
-                    if (javaType == long.class) {
-                        type.writeLong(output, Long.valueOf(colVal));
+                    pageBuilder.declarePosition();
+                    for (int column = 0; column < types.size(); column++) {
+                        BlockBuilder output = pageBuilder.getBlockBuilder(column);
+                        String fieldName = fieldNames.get(column);
+                        String colVal = record.get(fieldName);
+                        Type type = types.get(column);
+                        Class<?> javaType = type.getJavaType();
+                        if (javaType == long.class) {
+                            type.writeLong(output, Long.valueOf(colVal));
+                        }
+                        else if (javaType == Slice.class) {
+                            Slice slice = Slices.utf8Slice(colVal);
+                            type.writeSlice(output, slice, 0, slice.length());
+                        }
+                        else {
+                            throw new UnsupportedOperationException("unsupported type "+type.getDisplayName());
+                        }
                     }
-                    else if (javaType == Slice.class) {
-                        Slice slice = Slices.utf8Slice(colVal);
-                        type.writeSlice(output, slice, 0, slice.length());
-                    }
-                    else {
-                        throw new UnsupportedOperationException("unsupported type "+type.getDisplayName());
-                    }
+
                 }
-
+                Page page = pageBuilder.build();
+                pageBuilder.reset();
+                readFinished = true;
+                return page;
+            }catch (Exception e){
+                throw new RuntimeException("getOutput error",e);
             }
-            Page page = pageBuilder.build();
-            pageBuilder.reset();
 
-            return page;
-        }catch (Exception e){
-            throw new RuntimeException("getOutput error",e);
+
         }
+
     }
 }

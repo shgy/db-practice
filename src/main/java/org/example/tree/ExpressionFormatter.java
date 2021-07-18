@@ -59,6 +59,14 @@ public final class ExpressionFormatter
             }
         }
 
+
+        @Override
+        protected String visitDereferenceExpression(DereferenceExpression node, Void context)
+        {
+            String baseString = process(node.getBase(), context);
+            return baseString + "." + process(node.getField());
+        }
+
         @Override
         protected String visitLogicalBinaryExpression(LogicalBinaryExpression node, Void context)
         {

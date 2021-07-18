@@ -7,7 +7,13 @@ public class Field {
 
     private String name;
     private Type type;
+    private String table;
 
+    public Field(String name, Type type,String table){
+        this.name = name;
+        this.type = type;
+        this.table = table;
+    }
 
 
     public String getName() {
@@ -24,5 +30,9 @@ public class Field {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getTable(){
+        return table;
     }
 }

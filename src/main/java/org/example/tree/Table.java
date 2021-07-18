@@ -62,6 +62,14 @@ public class Table
         return Objects.equals(name, table.name);
     }
 
+
+    @Override
+    public <R, C> R accept(AstVisitor<R, C> visitor, C context)
+    {
+        return visitor.visitTable(this, context);
+    }
+
+
     @Override
     public int hashCode()
     {

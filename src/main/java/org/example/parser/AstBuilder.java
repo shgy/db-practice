@@ -109,6 +109,24 @@ public class AstBuilder
                 (Expression) visit(context.expression()),
                 Optional.empty());
     }
+
+    @Override
+    public Node visitAliasedRelation(SqlBaseParser.AliasedRelationContext context)
+    {
+        Relation child = (Relation) visit(context.relationPrimary());
+
+        if (context.identifier() == null) {
+            return child;
+        }
+
+        List<Identifier> aliases = null;
+        if (context.columnAliases() != null) {
+            aliases = visit(context.columnAliases().identifier(), Identifier.class);
+        }
+
+        return new AliasedRelation(getLocation(context), child, (Identifier) visit(context.identifier()), aliases);
+    }
+
     @Override
     public Node visitColumnReference(SqlBaseParser.ColumnReferenceContext context)
     {
@@ -171,6 +189,26 @@ public class AstBuilder
         return new LongLiteral(getLocation(context), context.getText());
     }
 
+
+    @Override
+    public Node visitJoinRelation(SqlBaseParser.JoinRelationContext context)
+    {
+        Relation left = (Relation) visit(context.left);
+        Relation right = (Relation) visit(context.rightRelation);
+
+
+//        JoinCriteria criteria;
+//        if (context.joinCriteria().ON() != null) {
+//            criteria = new JoinOn((Expression) visit(context.joinCriteria().booleanExpression()));
+//        }else {
+//            throw new IllegalArgumentException("Unsupported join criteria");
+//        }
+
+        Join.Type joinType = Join.Type.CROSS;
+
+        return new Join(getLocation(context), joinType, left, right, Optional.empty());
+    }
+
     @Override
     public Node visitComparison(SqlBaseParser.ComparisonContext context)
     {
@@ -181,6 +219,14 @@ public class AstBuilder
                 (Expression) visit(context.right));
     }
 
+    @Override
+    public Node visitDereference(SqlBaseParser.DereferenceContext context)
+    {
+        return new DereferenceExpression(
+                getLocation(context),
+                (Expression) visit(context.base),
+                (Identifier) visit(context.fieldName));
+    }
 
     private static ComparisonExpression.Operator getComparisonOperator(Token symbol)
     {

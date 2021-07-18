@@ -80,10 +80,11 @@ valueExpression
     ;
 
 primaryExpression
-    : identifier                                                                          #columnReference
-    | number                                                                              #numericLiteral
+    : number                                                                              #numericLiteral
     | booleanValue                                                                        #booleanLiteral
     | string                                                                              #stringLiteral
+    | identifier                                                                          #columnReference
+    | base=primaryExpression '.' fieldName=identifier                                     #dereference
     ;
 
 sampledRelation
@@ -91,7 +92,11 @@ sampledRelation
     ;
 
 aliasedRelation
-    : relationPrimary
+    : relationPrimary (AS? identifier columnAliases?)?
+    ;
+
+columnAliases
+    : '(' identifier (',' identifier)* ')'
     ;
 
 relationPrimary
@@ -123,9 +128,11 @@ identifier
 
 
 AND: 'AND';
+AS:'AS';
 FROM: 'FROM';
 FALSE: 'FALSE';
 JOIN: 'JOIN';
+INNER: 'INNER';
 NOT: 'NOT';
 OR: 'OR';
 ON: 'ON';

@@ -22,8 +22,6 @@ import static java.util.Objects.requireNonNull;
  */
 public class JoinOperator implements Operator{
 
-    private TableScanOperator buildPageOperator;
-
     private Page probePage, buildPage;
 
     private NestedLoopPageBuilder nestedLoopPageBuilder;

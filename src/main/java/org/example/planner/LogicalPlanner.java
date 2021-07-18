@@ -13,56 +13,21 @@ import static com.facebook.presto.spi.StandardErrorCode.NOT_SUPPORTED;
 
 public class LogicalPlanner {
 
-    public List<Operator> plan(Statement statement){
+    public List<Operator> plan(Analysis analysis){
+
+        Statement statement = analysis.getStatement();
+
         if (statement instanceof Query) {
-            return createRelationPlan((Query) statement);
+            return createRelationPlan(analysis, (Query) statement);
         }else{
             throw new PrestoException(NOT_SUPPORTED, "Unsupported statement type " + statement.getClass().getSimpleName());
         }
     }
 
-    private List<Operator> createRelationPlan(Query query){
-        Visitor visitor=  new Visitor();
-        visitor.process(query);
-        return visitor.getResult();
+    private List<Operator> createRelationPlan(Analysis analysis, Query query){
+        RelationPlanner planner = new RelationPlanner(analysis);
+        planner.process(query);
+        return planner.getResult();
     }
 
-    class Visitor extends AstVisitor<Operator,Void>{
-        private List<Operator> result = Lists.newArrayList();
-
-        public List<Operator> getResult(){
-            return result;
-        }
-
-        @Override
-        protected Operator visitJoin(Join node, Void context){
-
-            Table probeTable = (Table) node.getLeft();
-            visitTable(probeTable,context);
-
-            Table buildTable = (Table) node.getRight();
-            visitTable(buildTable, context);
-
-            return null;
-        }
-
-        @Override
-        public Operator visitTable(Table node, Void context){
-            return null;
-        }
-
-        @Override
-        protected Operator visitQuerySpecification(QuerySpecification node, Void context){
-
-            /**
-             * select * from relation
-             */
-            Optional<Relation> relation = node.getFrom();
-            if(relation.isPresent()){
-
-            }
-
-            return null;
-        }
-    }
 }

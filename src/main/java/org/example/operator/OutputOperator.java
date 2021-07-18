@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
  */
 public class OutputOperator implements Operator{
 
-    private Page page;
 
     private List<Type> types;
     private List<String> fieldNames;
@@ -43,15 +42,6 @@ public class OutputOperator implements Operator{
 
     @Override
     public void addInput(Page page) {
-       this.page = page;
-    }
-
-    private void printHeader(String format ){
-        System.out.println( "|"+String.format(format, fieldNames.toArray())+"|");
-    }
-
-    @Override
-    public Page getOutput() {
         int width=30;
         String format = fieldNames.stream().map(s-> "%-"+width+"s").collect(Collectors.joining("|"));
         if(!headerPrinted){
@@ -80,6 +70,15 @@ public class OutputOperator implements Operator{
             }
             System.out.println( "|"+String.format(format, rowData.toArray())+"|");
         }
+    }
+
+    private void printHeader(String format ){
+        System.out.println( "|"+String.format(format, fieldNames.toArray())+"|");
+    }
+
+    @Override
+    public Page getOutput() {
+
         return  null;
     }
 }
